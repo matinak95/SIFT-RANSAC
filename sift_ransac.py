@@ -19,9 +19,9 @@ def sift_generator(img, img_id):
   #cv2.drawKeypoints(gray, keypoints, img)
 
   
-  # # show the image
-  cv2.imshow('image', sift_image)
-  cv2.waitKey()
+  # # # show the image
+  # cv2.imshow('image', sift_image)
+  # cv2.waitKey()
 
 
   # save the image
@@ -104,9 +104,10 @@ def main():
 
           good = matcher(desc_src, desc_dst)
 
-          img_match = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good,None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+          img_match = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good,None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+          img_match_show = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good[0:21],None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-          cv2.imwrite("Results/src_"+img_id[-1]+"_dst_"+dest_id[-1]+"_all_matches.jpg", img_match)
+          cv2.imwrite("Results/src_"+img_id[-1]+"_dst_"+dest_id[-1]+"_all_matches.jpg", img_match_show)
           # cv2.imshow("image", img_match)
           # cv2.waitKey()
 
@@ -116,7 +117,7 @@ def main():
                             singlePointColor = None,
                             matchesMask = matchesMask, # draw only inliers
                             flags = 2)
-          final_img = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good,None,**draw_params)
+          final_img = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good,None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,**draw_params)
           cv2.imwrite("Results/src_"+img_id[-1]+"_dst_"+dest_id[-1]+"_ransac_homography.jpg", final_img)
           
           # cv2.imshow('image', final_img)
