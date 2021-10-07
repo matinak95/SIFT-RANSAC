@@ -28,6 +28,7 @@ def matcher(desc_s,desc_d):
   bf = cv2.BFMatcher()
 
   matches = bf.knnMatch(desc_s, desc_d, k=2)
+
   print("Number of Matches: {}".format(len(matches)))
 
 
@@ -38,6 +39,7 @@ def matcher(desc_s,desc_d):
           good.append(m)
   
   print("Number of Good Matches: {}".format(len(good)))
+  good = sorted(good, key = lambda x:x.distance)
   return good
 
 def homographer(kp1, kp2, src_img, dst_img, good):
@@ -50,6 +52,8 @@ def homographer(kp1, kp2, src_img, dst_img, good):
     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
 
     print("M Matrix is: {}".format(M))
+
+    
 
 
     matchesMask = mask.ravel().tolist()
@@ -112,13 +116,19 @@ def main():
           cv2.imwrite("Results/src_"+img_id[-1]+"_dst_"+dest_id[-1]+"_all_matches.jpg", img_match_show)
 
           img_dest, matchesMask = homographer(key_src, key_dst, img_src, img_dest, good)
+
+          for i in range(len(matchesMask)):
+            if sum(matchesMask[0:i])==10:
+              index=i
+              break
+
           
 
           draw_params = dict(
                             singlePointColor = None,
-                            matchesMask = matchesMask, # draw only inliers
+                            matchesMask = matchesMask[0:index], # draw only inliers
                             flags = cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-          final_img = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good,None,**draw_params)
+          final_img = cv2.drawMatches(img_src,key_src,img_dest,key_dst,good[0:index],None,**draw_params)
           cv2.imwrite("Results/src_"+img_id[-1]+"_dst_"+dest_id[-1]+"_ransac_homography.jpg", final_img)
           
 
